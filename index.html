@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galaxy ✨</title>
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+html{
+    scroll-behavior:smooth;
+}
+body{
+    font-family:Arial, "Segoe UI", sans-serif;
+    background:#05010d;
+    color:white;
+    overflow-x:hidden;
+}
+/* ===== Galaxy Background ===== */
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:-3;
+    background:
+        radial-gradient(circle at 20% 20%, #6b21a8 0, transparent 25%),
+        radial-gradient(circle at 80% 30%, #1d4ed8 0, transparent 25%),
+        radial-gradient(circle at 50% 80%, #be185d 0, transparent 25%),
+        #05010d;
+}
+/* Stars */
+#stars{
+    position:fixed;
+    inset:0;
+    z-index:-2;
+    pointer-events:none;
+}
+.star{
+    position:absolute;
+    width:2px;
+    height:2px;
+    background:white;
+    border-radius:50%;
+    animation:twinkle 2s infinite alternate;
+}
+@keyframes twinkle{
+    from{
+        opacity:.2;
+        transform:scale(.7);
+    }
+    to{
+        opacity:1;
+        transform:scale(1.5);
+    }
+}
+/* ===== Navbar ===== */
+nav{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    padding:18px 7%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:rgba(5,1,13,.45);
+    backdrop-filter:blur(15px);
+    border-bottom:1px solid rgba(255,255,255,.08);
+    z-index:100;
+}
+.logo{
+    font-size:22px;
+    font-weight:bold;
+    color:#fff;
+    text-shadow:0 0 15px #c084fc;
+}
+nav a{
+    color:#ddd;
+    text-decoration:none;
+    margin-left:25px;
+    transition:.3s;
+}
+nav a:hover{
+    color:#e879f9;
+    text-shadow:0 0 10px #e879f9;
+}
+/* ===== Hero ===== */
+.hero{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:100px 20px 50px;
+}
+.hero-content{
+    max-width:800px;
+}
+.badge{
+    display:inline-block;
+    padding:8px 18px;
+    border:1px solid rgba(255,255,255,.2);
+    border-radius:30px;
+    background:rgba(255,255,255,.06);
+    backdrop-filter:blur(10px);
+    margin-bottom:25px;
+    animation:pulse 2s infinite;
+}
+@keyframes pulse{
+    50%{
+        box-shadow:0 0 30px rgba(217,70,239,.3);
+    }
+}
+h1{
+    font-size:clamp(50px,10vw,100px);
+    line-height:1;
+    background:linear-gradient(
+        90deg,
+        #c084fc,
+        #f0abfc,
+        #60a5fa,
+        #c084fc
+    );
+    background-size:300%;
+    -webkit-background-clip:text;
+    color:transparent;
+    animation:gradient 5s linear infinite;
+}
+@keyframes gradient{
+    to{
+        background-position:300%;
+    }
+}
+.hero p{
+    margin:25px auto;
+    max-width:600px;
+    font-size:18px;
+    line-height:1.8;
+    color:#d4d4d8;
+}
+.btn{
+    display:inline-block;
+    padding:14px 30px;
+    border-radius:50px;
+    background:linear-gradient(90deg,#9333ea,#db2777);
+    color:white;
+    text-decoration:none;
+    font-weight:bold;
+    box-shadow:0 0 25px rgba(168,85,247,.4);
+    transition:.3s;
+    cursor:pointer;
+    border:none;
+    font-size:16px;
+}
+.btn:hover{
+    transform:translateY(-4px) scale(1.03);
+    box-shadow:0 0 40px rgba(236,72,153,.7);
+}
+/* ===== Sections ===== */
+section{
+    padding:100px 7%;
+}
+.section-title{
+    text-align:center;
+    margin-bottom:50px;
+}
+.section-title h2{
+    font-size:42px;
+}
+.section-title p{
+    color:#aaa;
+    margin-top:10px;
+}
+/* ===== Cards ===== */
+.cards{
+    max-width:1100px;
+    margin:auto;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:25px;
+}
+.card{
+    padding:30px;
+    min-height:220px;
+    border:1px solid rgba(255,255,255,.1);
+    background:rgba(255,255,255,.05);
+    border-radius:25px;
+    backdrop-filter:blur(15px);
+    transition:.4s;
+}
+.card:hover{
+    transform:translateY(-10px);
+    border-color:#c084fc;
+    box-shadow:0 0 35px rgba(168,85,247,.2);
+}
+.icon{
+    font-size:45px;
+    margin-bottom:20px;
+}
+.card h3{
+    margin-bottom:12px;
+}
+.card p{
+    color:#aaa;
+    line-height:1.7;
+}
+/* ===== Counter ===== */
+.counter{
+    text-align:center;
+    max-width:700px;
+    margin:auto;
+    padding:50px 20px;
+    border-radius:30px;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.1);
+}
+.counter-number{
+    font-size:70px;
+    font-weight:bold;
+    color:#f0abfc;
+    text-shadow:0 0 25px #d946ef;
+}
+/* ===== Footer ===== */
+footer{
+    text-align:center;
+    padding:50px 20px;
+    color:#777;
+    border-top:1px solid rgba(255,255,255,.08);
+}
+/* ===== Scroll Animation ===== */
+.reveal{
+    opacity:0;
+    transform:translateY(50px);
+    transition:1s;
+}
+.reveal.show{
+    opacity:1;
+    transform:translateY(0);
+}
+/* ===== Mobile ===== */
+@media(max-width:600px){
+    nav{
+        padding:15px 20px;
+    }
+    nav .links{
+        display:none;
+    }
+    section{
+        padding:80px 20px;
+    }
+    .hero p{
+        font-size:16px;
+    }
+    .section-title h2{
+        font-size:32px;
+    }
+    .counter-number{
+        font-size:55px;
+    }
+}
+</style>
+</head>
+<body>
+<!-- ดาว -->
+<div id="stars"></div>
+<!-- Navbar -->
+<nav>
+    <div class="logo">✦ GALAXY</div>
+    <div class="links">
+        <a href="#home">หน้าแรก</a>
+        <a href="#explore">สำรวจ</a>
+        <a href="#about">เกี่ยวกับ</a>
+    </div>
+</nav>
+<!-- Hero -->
+<section class="hero" id="home">
+    <div class="hero-content">
+        <div class="badge">
+            ✨ Welcome to the Galaxy
+        </div>
+        <h1>Explore<br>the Universe</h1>
+        <p>
+            บางครั้งจักรวาลก็ไม่ได้อยู่ไกลเลย
+            เพียงแค่เราหยุดมองขึ้นไปบนท้องฟ้า
+            ก็อาจพบเรื่องราวที่สวยงามกว่าที่คิด
+        </p>
+        <a href="#explore" class="btn">
+            🚀 เริ่มสำรวจ
+        </a>
+    </div>
+</section>
+<!-- Explore -->
+<section id="explore">
+    <div class="section-title reveal">
+        <h2>🌌 Explore</h2>
+        <p>
+            ค้นพบสิ่งที่ซ่อนอยู่ในจักรวาล
+        </p>
+    </div>
+    <div class="cards">
+        <div class="card reveal">
+            <div class="icon">🌙</div>
+            <h3>Moon</h3>
+            <p>
+                ดวงจันทร์ที่ส่องแสงอยู่ท่ามกลาง
+                ความมืดของจักรวาล
+            </p>
+        </div>
+        <div class="card reveal">
+            <div class="icon">🪐</div>
+            <h3>Planet</h3>
+            <p>
+                ดาวเคราะห์นับไม่ถ้วน
+                ที่กำลังเดินทางอยู่ในจักรวาล
+            </p>
+        </div>
+        <div class="card reveal">
+            <div class="icon">⭐</div>
+            <h3>Stars</h3>
+            <p>
+                แสงจากดวงดาวที่เราเห็นในวันนี้
+                อาจเดินทางมาเป็นเวลาหลายปี
+            </p>
+        </div>
+        <div class="card reveal">
+            <div class="icon">🚀</div>
+            <h3>Future</h3>
+            <p>
+                จินตนาการถึงอนาคต
+                ที่มนุษย์สามารถเดินทางไปไกลกว่าที่เคย
+            </p>
+        </div>
+    </div>
+</section>
+<!-- Counter -->
+<section id="about">
+    <div class="section-title reveal">
+        <h2>✨ Your Journey</h2>
+        <p>
+            ทุกการเดินทางเริ่มต้นจากก้าวแรก
+        </p>
+    </div>
+    <div class="counter reveal">
+        <p>คุณกำลังเดินทางเข้าสู่จักรวาลมาแล้ว</p>
+        <div class="counter-number" id="counter">
+            0
+        </div>
+        <p>
+            วินาที 🚀
+        </p>
+        <br>
+        <button class="btn" onclick="createHeart()">
+            💜 ส่งหัวใจ
+        </button>
+    </div>
+</section>
+<footer>
+    Made with ✨ HTML + CSS + JavaScript
+</footer>
+<script>
+/* =========================
+   STAR GENERATOR
+========================= */
+const stars = document.getElementById("stars");
+for(let i = 0; i < 180; i++){
+    const star = document.createElement("div");
+    star.className = "star";
+    star.style.left = Math.random() * 100 + "%";
+    star.style.top = Math.random() * 100 + "%";
+    const size = Math.random() * 3 + 1;
+    star.style.width = size + "px";
+    star.style.height = size + "px";
+    star.style.animationDelay =
+        Math.random() * 3 + "s";
+    stars.appendChild(star);
+}
+/* =========================
+   COUNTER
+========================= */
+let seconds = 0;
+setInterval(() => {
+    seconds++;
+    document.getElementById("counter")
+        .textContent = seconds;
+},1000);
+/* =========================
+   SCROLL REVEAL
+========================= */
+const observer = new IntersectionObserver(
+    entries => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting){
+                entry.target.classList.add("show");
+            }
+        });
+    },
+    {
+        threshold:.15
+    }
+);
+document.querySelectorAll(".reveal")
+    .forEach(el => observer.observe(el));
+/* =========================
+   FLOATING HEART
+========================= */
+function createHeart(){
+    const heart = document.createElement("div");
+    heart.innerHTML = "💜";
+    heart.style.position = "fixed";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.bottom = "20px";
+    heart.style.fontSize =
+        Math.random() * 20 + 20 + "px";
+    heart.style.zIndex = "999";
+    heart.style.pointerEvents = "none";
+    document.body.appendChild(heart);
+    const animation =
+        heart.animate(
+            [
+                {
+                    transform:"translateY(0) scale(1)",
+                    opacity:1
+                },
+                {
+                    transform:
+                    "translateY(-100vh) rotate(360deg) scale(1.5)",
+                    opacity:0
+                }
+            ],
+            {
+                duration:2500,
+                easing:"ease-out"
+            }
+        );
+    animation.onfinish = () => {
+        heart.remove();
+    };
+}
+/* =========================
+   RANDOM HEARTS
+========================= */
+setInterval(() => {
+    if(Math.random() > .6){
+        createHeart();
+    }
+},3000);
+</script>
+</body>
+</html>
