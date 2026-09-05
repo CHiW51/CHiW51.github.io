@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>วันครบรอบของแบบนี้นะ 🌌✨❤️</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body {
+    width:100%; height:100%; overflow:hidden;
+    background:#050208;
+    font-family:'Prompt',sans-serif;
+    touch-action:none;
+  }
+  #stage { position:fixed; inset:0; }
+  canvas#stars { position:fixed; inset:0; z-index:0; }
+
+  /* ---------- caption ---------- */
+  #caption {
+    position:fixed; top:5%; left:0; right:0; z-index:50;
+    text-align:center; pointer-events:none;
+    color:#fff; font-weight:700;
+    font-size:clamp(20px,6vw,34px);
+    text-shadow:0 0 18px rgba(255,120,200,.8), 0 2px 6px #000;
+    letter-spacing:1px;
+  }
+  #caption .icons { font-size:.8em; margin-top:2px; filter:drop-shadow(0 0 8px #f0a); }
+
+  /* ---------- scenes ---------- */
+  .scene {
+    position:fixed; inset:0; z-index:10;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none;
+    transition:opacity .8s ease;
+  }
+  .scene.active { opacity:1; pointer-events:auto; }
+
+  /* heart scene hint */
+  #tapHint {
+    position:fixed; bottom:8%; left:0; right:0; z-index:40;
+    text-align:center; color:#ffb7dd; font-size:14px; font-weight:300;
+    text-shadow:0 0 10px #f4a; opacity:.9; pointer-events:none;
+    animation:pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:.35; transform:scale(.97);} 50%{opacity:1; transform:scale(1);} }
+
+  /* ---------- 3D photo sphere ---------- */
+  #sphereScene { perspective:1100px; }
+  #sphere {
+    position:relative; width:0; height:0;
+    transform-style:preserve-3d;
+    animation:spinSphere 14s linear infinite;
+  }
+  @keyframes spinSphere { from{transform:rotateX(-12deg) rotateY(0);} to{transform:rotateX(-12deg) rotateY(360deg);} }
+  .sphere-photo {
+    position:absolute; width:92px; height:120px;
+    left:-46px; top:-60px;
+    border-radius:10px; overflow:hidden;
+    border:2px solid rgba(255,255,255,.85);
+    box-shadow:0 0 18px rgba(255,90,180,.55);
+    backface-visibility:visible;
+    background:#222;
+  }
+  .sphere-photo img { width:100%; height:100%; object-fit:cover; display:block; }
+
+  /* ---------- grid scene ---------- */
+  #gridScene { flex-direction:column; }
+  #photoGrid {
+    display:grid; gap:8px;
+    grid-template-columns:repeat(4,1fr);
+    width:min(92vw,430px);
+    transform:rotate(-4deg);
+  }
+  #photoGrid .g {
+    aspect-ratio:3/4; border-radius:8px; overflow:hidden;
+    border:2px solid rgba(255,255,255,.8);
+    box-shadow:0 0 14px rgba(255,90,180,.45);
+    animation:gridIn .7s cubic-bezier(.2,1.4,.4,1) backwards;
+    background:#222;
+  }
+  #photoGrid .g img { width:100%; height:100%; object-fit:cover; display:block; }
+  @keyframes gridIn { from{transform:scale(0) rotate(40deg); opacity:0;} to{transform:scale(1) rotate(0); opacity:1;} }
+
+  /* ---------- floating tiles scene ---------- */
+  .tile {
+    position:absolute; width:78px; height:104px;
+    border-radius:10px; overflow:hidden;
+    border:2px solid rgba(255,255,255,.85);
+    box-shadow:0 0 20px rgba(255,80,180,.6);
+    animation:floatTile var(--dur) ease-in-out var(--del) infinite alternate;
+    background:#222;
+  }
+  .tile img { width:100%; height:100%; object-fit:cover; }
+  @keyframes floatTile {
+    from { transform:translate(0,0) rotate(var(--r1)); }
+    to   { transform:translate(var(--tx),var(--ty)) rotate(var(--r2)); }
+  }
+
+  /* ---------- envelope scene ---------- */
+  #envScene { flex-direction:column; gap:24px; }
+  #envelope {
+    width:92px; height:92px; cursor:pointer; position:relative;
+    filter:drop-shadow(0 0 22px rgba(255,120,220,.9));
+    animation:envPulse 1.8s ease-in-out infinite;
+    transition:transform .3s;
+  }
+  #envelope:active { transform:scale(.85); }
+  @keyframes envPulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.12);} }
+  #envelope svg { width:100%; height:100%; }
+
+  /* ---------- letter ---------- */
+  #letterWrap {
+    position:fixed; inset:0; z-index:60;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(3,0,10,.55);
+    opacity:0; pointer-events:none; transition:opacity .6s;
+  }
+  #letterWrap.show { opacity:1; pointer-events:auto; }
+  #letter {
+    width:min(86vw,420px); max-height:74vh; overflow-y:auto;
+    background:linear-gradient(160deg,#fff5fa,#ffe4f1 60%,#ffd6ec);
+    border-radius:18px; padding:28px 26px;
+    box-shadow:0 0 60px rgba(255,110,200,.55), inset 0 0 30px rgba(255,180,220,.35);
+    transform:rotate(-3deg) scale(.6); opacity:0;
+    transition:transform .8s cubic-bezier(.2,1.5,.4,1), opacity .5s;
+    position:relative;
+  }
+  #letterWrap.show #letter { transform:rotate(-3deg) scale(1); opacity:1; }
+  #letter .butterfly { position:absolute; font-size:30px; filter:drop-shadow(0 0 6px #f6a); }
+  #letter .b1 { top:-14px; left:-10px; }
+  #letter .b2 { bottom:-12px; right:-8px; transform:scaleX(-1); }
+  #letterTitle {
+    text-align:center; font-weight:700; color:#a1246b;
+    font-size:20px; margin-bottom:14px;
+    border-bottom:2px dashed #f3a8cd; padding-bottom:10px;
+  }
+  #letterBody { color:#6e1c4e; font-size:15.5px; line-height:1.95; font-weight:400; white-space:pre-wrap; min-height:200px; }
+  #letterBody .cursor { display:inline-block; width:2px; height:1em; background:#c42b82; vertical-align:-2px; animation:blink .8s steps(1) infinite; }
+  @keyframes blink { 50%{opacity:0;} }
+  #closeLetter {
+    display:block; margin:18px auto 0; padding:9px 34px;
+    background:linear-gradient(135deg,#ff5fa8,#c42b82); color:#fff;
+    border:none; border-radius:30px; font-family:inherit; font-size:15px; font-weight:600;
+    cursor:pointer; box-shadow:0 4px 18px rgba(255,80,170,.5);
+  }
+  #replayBtn {
+    position:fixed; bottom:5%; left:50%; transform:translateX(-50%); z-index:70;
+    padding:10px 30px; border-radius:30px; border:1px solid rgba(255,150,210,.6);
+    background:rgba(30,5,30,.6); color:#ffc7e6; font-family:inherit; font-size:14px;
+    cursor:pointer; backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:opacity .6s;
+  }
+  #replayBtn.show { opacity:1; pointer-events:auto; }
+</style>
+<base target="_blank">
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div id="stage"></div>
+
+<div id="caption">มีอะไรจะบอก<div class="icons">🌌 ✨ ❤️</div></div>
+<div id="tapHint">แตะหน้าจอเพื่อไปต่อ 💗</div>
+
+<!-- scene: text -->
+<div class="scene" id="textScene"><canvas id="textCanvas"></canvas></div>
+
+<!-- scene: sphere -->
+<div class="scene" id="sphereScene"><div id="sphere"></div></div>
+
+<!-- scene: grid -->
+<div class="scene" id="gridScene"><div id="photoGrid"></div></div>
+
+<!-- scene: floating tiles -->
+<div class="scene" id="tilesScene"></div>
+
+<!-- scene: envelope -->
+<div class="scene" id="envScene">
+  <div id="envelope">
+    <svg viewBox="0 0 24 24" fill="none">
+      <path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"
+        fill="rgba(255,120,220,.15)" stroke="#ff9ed6" stroke-width="1.4"/>
+      <path d="M3.5 7.5 12 13l8.5-5.5" stroke="#ff9ed6" stroke-width="1.4" stroke-linecap="round"/>
+    </svg>
+  </div>
+</div>
+
+<!-- letter -->
+<div id="letterWrap">
+  <div id="letter">
+    <div class="butterfly b1">🦋</div>
+    <div class="butterfly b2">🦋</div>
+    <div id="letterTitle">ถึงน้องแพรของพี่ 💌</div>
+    <div id="letterBody"><span class="cursor"></span></div>
+    <button id="closeLetter">ปิดจดหมาย</button>
+  </div>
+</div>
+<button id="replayBtn">▶ เล่นอีกครั้ง</button>
+
+<script>
+/* ================= STARFIELD ================= */
+const sc = document.getElementById('stars'), sx = sc.getContext('2d');
+let stars = [];
+function initStars(){
+  sc.width = innerWidth; sc.height = innerHeight;
+  stars = Array.from({length:180},()=>({
+    x:Math.random()*sc.width, y:Math.random()*sc.height,
+    r:Math.random()*1.4+.3, p:Math.random()*Math.PI*2, s:.5+Math.random()*1.5
+  }));
+}
+initStars(); addEventListener('resize', initStars);
+(function starLoop(t){
+  sx.clearRect(0,0,sc.width,sc.height);
+  for(const s of stars){
+    s.p += .03;
+    sx.globalAlpha = .35 + Math.abs(Math.sin(s.p))*.65;
+    sx.fillStyle = '#fff';
+    sx.beginPath(); sx.arc(s.x,s.y,s.r,0,7); sx.fill();
+    s.y += s.s*.15; if(s.y > sc.height) s.y = -2;
+  }
+  sx.globalAlpha = 1;
+  requestAnimationFrame(starLoop);
+})();
+
+/* ================= PARTICLE ENGINE (heart + text) ================= */
+const pc = document.getElementById('textCanvas'), px = pc.getContext('2d');
+function sizeTextCanvas(){ pc.width = innerWidth; pc.height = innerHeight; }
+sizeTextCanvas(); addEventListener('resize', sizeTextCanvas);
+
+class Particle {
+  constructor(){ this.reset(); }
+  reset(){
+    this.x = Math.random()*pc.width; this.y = Math.random()*pc.height;
+    this.vx = 0; this.vy = 0; this.tx = 0; this.ty = 0;
+    this.size = Math.random()*1.8+.8;
+    this.color = Math.random()<.7 ? '#ff77c8' : (Math.random()<.5?'#ffffff':'#c86bff');
+    this.free = true;
+  }
+  seek(){ this.free = false; }
+  update(){
+    if(this.free){
+      this.x += (Math.random()-.5)*.6; this.y += (Math.random()-.5)*.6;
+      if(this.x<0)this.x=pc.width; if(this.x>pc.width)this.x=0;
+      if(this.y<0)this.y=pc.height; if(this.y>pc.height)this.y=0;
+    } else {
+      const dx = this.tx-this.x, dy = this.ty-this.y;
+      this.vx += dx*.012; this.vy += dy*.012;
+      this.vx *= .88; this.vy *= .88;
+      this.x += this.vx; this.y += this.vy;
+    }
+  }
+  draw(){
+    px.globalAlpha = .95;
+    px.fillStyle = this.color;
+    px.shadowColor = '#ff4fb0'; px.shadowBlur = 6;
+    px.beginPath(); px.arc(this.x,this.y,this.size,0,7); px.fill();
+    px.shadowBlur = 0; px.globalAlpha = 1;
+  }
+}
+const particles = Array.from({length:900},()=>new Particle());
+
+function heartPoints(n, scale){
+  const pts = [];
+  for(let i=0;i<n;i++){
+    const t = (i/n)*Math.PI*2;
+    const x = 16*Math.pow(Math.sin(t),3);
+    const y = 13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t);
+    pts.push({ x: pc.width/2 + x*scale + (Math.random()-.5)*10,
+               y: pc.height/2 - y*scale + (Math.random()-.5)*10 });
+  }
+  return pts;
+}
+function textPoints(text, n){
+  const off = document.createElement('canvas');
+  off.width = pc.width; off.height = pc.height;
+  const ox = off.getContext('2d');
+  const fs = Math.min(pc.width*.22, 130);
+  ox.font = `700 ${fs}px Prompt, sans-serif`;
+  ox.textAlign='center'; ox.textBaseline='middle';
+  ox.fillStyle='#fff';
+  ox.fillText(text, pc.width/2, pc.height/2);
+  const data = ox.getImageData(0,0,off.width,off.height).data;
+  const solid = [];
+  for(let y=0;y<off.height;y+=4) for(let x=0;x<off.width;x+=4)
+    if(data[(y*off.width+x)*4+3] > 128) solid.push({x,y});
+  const pts = [];
+  for(let i=0;i<n;i++) pts.push(solid[Math.floor(Math.random()*solid.length)] || {x:pc.width/2,y:pc.height/2});
+  return pts;
+}
+
+let formation = null; // {pts, until}
+function formHeart(scale=8){ formation = {pts:heartPoints(particles.length, scale)}; particles.forEach((p,i)=>{p.seek();p.tx=formation.pts[i].x;p.ty=formation.pts[i].y;}); }
+function formText(t){ formation = {pts:textPoints(t, particles.length)}; particles.forEach((p,i)=>{p.seek();p.tx=formation.pts[i].x;p.ty=formation.pts[i].y;}); }
+function releaseParticles(){ formation=null; particles.forEach(p=>p.free=true); }
+
+(function pLoop(){
+  px.clearRect(0,0,pc.width,pc.height);
+  particles.forEach(p=>{p.update();p.draw();});
+  requestAnimationFrame(pLoop);
+})();
+
+/* ================= PHOTOS ================= */
+  const PHOTOS = [
+    "photo1.jpg",
+    "photo2.jpg",
+    "photo3.jpg",
+    "photo4.jpg",
+    "photo5.jpg",
+    "photo6.jpg",
+    "photo7.jpg",
+    "photo8.jpg",
+    "photo9.jpg",
+    "photo10.jpg",
+    "photo11.jpg",
+    "photo12.jpg",
+    "photo13.jpg",
+    "photo14.jpg",
+    "photo15.jpg",
+    "photo16.jpg",
+    "photo17.jpg",
+    "photo18.jpg",
+    "photo19.jpg",
+    "photo20.jpg",
+    "photo21.jpg",
+    "photo22.jpg",
+    "photo23.jpg",
+    "photo24.jpg",
+    "photo25.jpg",
+    "photo26.jpg",
+
+    
+ 
+    
+  ];
+
+/* sphere */
+const sphereEl = document.getElementById('sphere');
+(function buildSphere(){
+  const R = Math.min(innerWidth,innerHeight)*.33;
+  const N = 18, golden = Math.PI*(3-Math.sqrt(5));
+  for(let i=0;i<N;i++){
+    const y = 1-(i/(N-1))*2, r = Math.sqrt(1-y*y), th = golden*i;
+    const d = document.createElement('div');
+    d.className='sphere-photo';
+    d.style.transform = `translate3d(${Math.cos(th)*r*R}px, ${y*R*.8}px, ${Math.sin(th)*r*R}px) rotateY(${Math.random()*20-10}deg)`;
+    d.innerHTML = `<img src="${PHOTOS[i]}" loading="lazy" alt="">`;
+    sphereEl.appendChild(d);
+  }
+})();
+
+/* grid */
+(function buildGrid(){
+  const g = document.getElementById('photoGrid');
+  for(let i=0;i<16;i++){
+    const d = document.createElement('div');
+    d.className='g';
+    d.style.animationDelay = (i*45)+'ms';
+    d.innerHTML = `<img src="${PHOTOS[(i+6)%24]}" loading="lazy" alt="">`;
+    g.appendChild(d);
+  }
+})();
+
+/* floating tiles */
+(function buildTiles(){
+  const s = document.getElementById('tilesScene');
+  for(let i=0;i<14;i++){
+    const d = document.createElement('div');
+    d.className='tile';
+    const w = 78;
+    d.style.left = (8+Math.random()*80)+'vw';
+    d.style.top  = (12+Math.random()*70)+'vh';
+    d.style.setProperty('--tx',(Math.random()*80-40)+'px');
+    d.style.setProperty('--ty',(Math.random()*80-40)+'px');
+    d.style.setProperty('--r1',(Math.random()*30-15)+'deg');
+    d.style.setProperty('--r2',(Math.random()*30-15)+'deg');
+    d.style.setProperty('--dur',(3+Math.random()*3)+'s');
+    d.style.setProperty('--del',(Math.random()*2)+'s');
+    d.innerHTML = `<img src="${PHOTOS[(i+12)%24]}" loading="lazy" alt="">`;
+    s.appendChild(d);
+  }
+})();
+
+/* ================= LETTER ================= */
+const LETTER = `มีอะไรกันนะ. 👉👈`;
+let typing = null;
+function typeLetter(){
+  clearInterval(typing);
+  const body = document.getElementById('letterBody');
+  body.innerHTML = '<span class="cursor"></span>';
+  let i = 0;
+  typing = setInterval(()=>{
+    if(i >= LETTER.length){ clearInterval(typing); return; }
+    body.insertBefore(document.createTextNode(LETTER[i]), body.lastChild);
+    i++;
+  }, 45);
+}
+
+/* ================= SCENE DIRECTOR ================= */
+const scenes = ['textScene','sphereScene','gridScene','tilesScene','envScene'];
+const hint = document.getElementById('tapHint');
+let step = 0, heartShown = false, autoTimer = null;
+
+function showScene(id){
+  document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active'));
+  if(id) document.getElementById(id).classList.add('active');
+}
+function next(){
+  clearTimeout(autoTimer);
+  step++;
+  hint.style.display = 'none';
+  switch(step){
+    case 1: // "แบบนี้ดี" text
+      showScene('textScene'); formText('เค้ารักเธอนะ');
+      autoTimer = setTimeout(next, 4200); break;
+    case 2: // sphere
+      showScene('sphereScene');
+      autoTimer = setTimeout(next, 6500); break;
+    case 3: // grid
+      showScene('gridScene');
+      autoTimer = setTimeout(next, 5000); break;
+    case 4: // tiles
+      showScene('tilesScene');
+      autoTimer = setTimeout(next, 6000); break;
+    case 5: // envelope
+      showScene('envScene'); hint.textContent='แตะซองจดหมายเพื่อเปิดอ่าน 💌'; hint.style.display='block';
+      break;
+  }
+}
+/* tap to advance (heart / text phases) */
+addEventListener('pointerdown', e=>{
+  if(e.target.closest('#letterWrap,#replayBtn,#closeLetter,#envelope')) return;
+  if(step===0){
+    if(!heartShown){ heartShown = true; formHeart(8); }
+    else next();
+  }
+});
+/* envelope click */
+document.getElementById('envelope').addEventListener('click', ()=>{
+  document.getElementById('letterWrap').classList.add('show');
+  hint.style.display='none';
+  setTimeout(typeLetter, 700);
+  document.getElementById('replayBtn').classList.add('show');
+});
+document.getElementById('closeLetter').addEventListener('click', ()=>{
+  document.getElementById('letterWrap').classList.remove('show');
+});
+document.getElementById('replayBtn').addEventListener('click', ()=>{
+  location.reload();
+});
+
+/* start: heart visible immediately like the video */
+showScene('textScene'); formHeart(8); heartShown = true;
+</script>
+</body>
+</html>
