@@ -7,7 +7,7 @@
   <meta name="description" content="CHIWSPACE — Interactive 3D Digital Universe Art Installation">
   <meta name="theme-color" content="#020206">
   
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=chiwspace_v2">
 
   <!-- Three.js (r128) via CDN with resilient multi-CDN fallback -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -27,13 +27,14 @@
   <!-- Opening Curtain for cinematic fade from darkness -->
   <div class="opening-curtain" id="openingCurtain" aria-hidden="true"></div>
 
-  <!-- Accessible semantic identifier (Zero visible UI/text except 3D CHIWWIE) -->
-  <h1 class="sr-only">CHIWWIE</h1>
+  <!-- Accessible semantic identifier (Zero visible UI/text except 3D CHIWSPACE) -->
+  <h1 class="sr-only">CHIWSPACE</h1>
 
   <!-- Futuristic Custom Trailing Cursor -->
   <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
   <div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
 
-  <script src="script.js"></script>
+  <!-- Cache-busted script loader to guarantee latest 3D layout -->
+  <script src="script.js?v=chiwspace_v2"></script>
 </body>
 </html>

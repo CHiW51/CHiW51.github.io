@@ -1,7 +1,9 @@
 /**
  * CHIWSPACE — 3D Immersive Universe Experience
  * Pure Three.js WebGL Interactive Art Installation
- * Layout: "CHIW" (Top) / "SPACE" (Bottom)
+ * Layout:
+ *      C   H   I   W      (ด้านบน)
+ *    S   P   A   C   E    (ด้านล่าง)
  * No Frameworks, No Backend, 100% Client-Side
  */
 
@@ -14,9 +16,9 @@
       fov: 45,
       near: 0.1,
       far: 1600,
-      initialZ: 370,
-      targetZ: 145,
-      mobileTargetZ: 215,
+      initialZ: 390,
+      targetZ: 175,
+      mobileTargetZ: 255,
     },
     particles: {
       deepStarCount: 2400,
@@ -24,10 +26,10 @@
       sparkCount: 190,
     },
     physics: {
-      mouseParallaxFactor: 22,
-      letterMagneticDist: 38,
-      letterMagneticPull: 0.32,
-      letterPullZ: 11,
+      mouseParallaxFactor: 24,
+      letterMagneticDist: 42,
+      letterMagneticPull: 0.35,
+      letterPullZ: 12,
       springDamping: 0.085,
     },
     colors: {
@@ -157,8 +159,8 @@
     // 6. Letter 'P' (Monolith pillar + upper loop with hole)
     const shapeP = new THREE.Shape();
     shapeP.moveTo(0, 0);
-    shapeP.lineTo(5.5, 0);
-    shapeP.lineTo(5.5, 11);
+    shapeP.lineTo(5.0, 0);
+    shapeP.lineTo(5.0, 11);
     shapeP.lineTo(19, 11);
     shapeP.lineTo(19, 26);
     shapeP.lineTo(0, 26);
@@ -252,27 +254,27 @@
 
   // --- Lighting Setup ---
   function setupLighting() {
-    ambientLight = new THREE.AmbientLight(0x0a1020, 1.25);
+    ambientLight = new THREE.AmbientLight(0x0a1020, 1.3);
     scene.add(ambientLight);
 
     // Dynamic Cursor Point Light (Cyan)
-    pointLightCyan = new THREE.PointLight(CONFIG.colors.cyan, 4.0, 300, 1.5);
-    pointLightCyan.position.set(0, 0, 50);
+    pointLightCyan = new THREE.PointLight(CONFIG.colors.cyan, 4.2, 320, 1.5);
+    pointLightCyan.position.set(0, 0, 55);
     scene.add(pointLightCyan);
 
     // Orbital Violet Atmosphere Light
-    pointLightViolet = new THREE.PointLight(CONFIG.colors.violet, 3.4, 340, 1.4);
-    pointLightViolet.position.set(-60, 30, -30);
+    pointLightViolet = new THREE.PointLight(CONFIG.colors.violet, 3.5, 360, 1.4);
+    pointLightViolet.position.set(-70, 35, -30);
     scene.add(pointLightViolet);
 
     // Counter-Orbit Magenta Light
-    pointLightMagenta = new THREE.PointLight(CONFIG.colors.magenta, 2.8, 300, 1.6);
-    pointLightMagenta.position.set(60, -25, -20);
+    pointLightMagenta = new THREE.PointLight(CONFIG.colors.magenta, 2.9, 320, 1.6);
+    pointLightMagenta.position.set(70, -30, -20);
     scene.add(pointLightMagenta);
 
     // Specular Rim Directional Light
     dirLightRim = new THREE.DirectionalLight(CONFIG.colors.platinum, 2.2);
-    dirLightRim.position.set(45, 95, 85);
+    dirLightRim.position.set(50, 100, 90);
     scene.add(dirLightRim);
   }
 
@@ -283,11 +285,11 @@
 
     const shapes = createLetterShapes();
 
-    // Line 1: CHIW (Top)
-    // Line 2: SPACE (Bottom)
+    // Line 1: C H I W (Top, Y = +20)
+    // Line 2: S P A C E (Bottom, Y = -20)
     const lines = [
-      { text: ['C', 'H', 'I', 'W'], yPos: 17 },
-      { text: ['S', 'P', 'A', 'C', 'E'], yPos: -17 }
+      { text: ['C', 'H', 'I', 'W'], yPos: 20 },
+      { text: ['S', 'P', 'A', 'C', 'E'], yPos: -20 }
     ];
 
     // Extrusion settings for deep beveled chamfers
@@ -312,22 +314,22 @@
       emissiveIntensity: 0.2,
     });
 
-    // Letter widths & spacing
+    // Generous luxury tracking/spacing for each letter
     const letterSpacings = {
-      C: 22,
-      H: 23,
-      I: 10,
-      W: 28,
-      S: 22,
-      P: 22,
-      A: 24,
-      E: 22,
+      C: 28,
+      H: 30,
+      I: 18,
+      W: 36,
+      S: 30,
+      P: 30,
+      A: 32,
+      E: 28,
     };
 
     let globalIndex = 0;
 
     lines.forEach((line) => {
-      // Calculate line width for center alignment
+      // Calculate total line width for true center alignment
       let lineWidth = 0;
       line.text.forEach((char) => {
         lineWidth += letterSpacings[char];
@@ -406,10 +408,10 @@
       const mesh = new THREE.Mesh(geom, sculptureMaterial.clone());
 
       const angle = (i / count) * Math.PI * 2;
-      const radius = 70 + Math.random() * 95;
-      const x = Math.cos(angle) * radius + (Math.random() - 0.5) * 45;
-      const y = Math.sin(angle) * (radius * 0.6) + (Math.random() - 0.5) * 45;
-      const z = (Math.random() - 0.5) * 170 - 20;
+      const radius = 75 + Math.random() * 105;
+      const x = Math.cos(angle) * radius + (Math.random() - 0.5) * 50;
+      const y = Math.sin(angle) * (radius * 0.6) + (Math.random() - 0.5) * 50;
+      const z = (Math.random() - 0.5) * 180 - 20;
 
       mesh.position.set(x, y, z);
       mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
@@ -442,7 +444,7 @@
     const color3 = new THREE.Color(0xffffff);
 
     for (let i = 0; i < count; i++) {
-      const r = 260 + Math.random() * 480;
+      const r = 280 + Math.random() * 500;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(Math.random() * 2 - 1);
 
@@ -490,10 +492,10 @@
     const magenta = new THREE.Color(CONFIG.colors.magenta);
 
     for (let i = 0; i < count; i++) {
-      // Surrounds both CHIW and SPACE lines
-      const x = (Math.random() - 0.5) * 160;
-      const y = (Math.random() - 0.5) * 90;
-      const z = (Math.random() - 0.5) * 80;
+      // Envelops both CHIW and SPACE lines
+      const x = (Math.random() - 0.5) * 190;
+      const y = (Math.random() - 0.5) * 105;
+      const z = (Math.random() - 0.5) * 85;
 
       positions[i * 3] = x;
       positions[i * 3 + 1] = y;
@@ -596,7 +598,7 @@
     // Staggered Wave Bounce on CHIWSPACE Letters
     letterMeshes.forEach((item, idx) => {
       setTimeout(() => {
-        item.impulseOffset = -14;
+        item.impulseOffset = -15;
         setTimeout(() => {
           item.impulseOffset = 0;
         }, 380);
@@ -619,11 +621,11 @@
     const isSmallMobile = width < 480;
 
     if (isSmallMobile) {
-      chiwspaceGroup.scale.set(0.72, 0.72, 0.72);
-      camera.targetZ = 225;
+      chiwspaceGroup.scale.set(0.68, 0.68, 0.68);
+      camera.targetZ = 245;
     } else if (isMobile) {
-      chiwspaceGroup.scale.set(0.85, 0.85, 0.85);
-      camera.targetZ = 185;
+      chiwspaceGroup.scale.set(0.82, 0.82, 0.82);
+      camera.targetZ = 205;
     } else {
       chiwspaceGroup.scale.set(1.0, 1.0, 1.0);
       camera.targetZ = CONFIG.camera.targetZ;
@@ -657,18 +659,18 @@
     camera.lookAt(0, 0, 0);
 
     // 2. Cursor Point Light Movement in 3D Space
-    pointLightCyan.position.x = mouse.x * 90;
-    pointLightCyan.position.y = mouse.y * 60;
-    pointLightCyan.position.z = 50;
+    pointLightCyan.position.x = mouse.x * 95;
+    pointLightCyan.position.y = mouse.y * 65;
+    pointLightCyan.position.z = 55;
 
     // Orbital Violet & Magenta lights
-    pointLightViolet.position.x = Math.cos(time * 0.6) * 95;
-    pointLightViolet.position.y = Math.sin(time * 0.8) * 45;
-    pointLightViolet.position.z = Math.sin(time * 0.5) * 55 - 20;
+    pointLightViolet.position.x = Math.cos(time * 0.6) * 105;
+    pointLightViolet.position.y = Math.sin(time * 0.8) * 50;
+    pointLightViolet.position.z = Math.sin(time * 0.5) * 60 - 20;
 
-    pointLightMagenta.position.x = -Math.cos(time * 0.5) * 90;
-    pointLightMagenta.position.y = -Math.sin(time * 0.7) * 40;
-    pointLightMagenta.position.z = Math.cos(time * 0.6) * 45 - 20;
+    pointLightMagenta.position.x = -Math.cos(time * 0.5) * 100;
+    pointLightMagenta.position.y = -Math.sin(time * 0.7) * 45;
+    pointLightMagenta.position.z = Math.cos(time * 0.6) * 50 - 20;
 
     // 3. CHIWSPACE Letters Entrance & Magnetic Physics
     let isAnyHovered = false;
@@ -784,7 +786,7 @@
         const dy = py - rayIntersection.y;
         const dz = pz - rayIntersection.z;
         const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        const repelRadius = 38;
+        const repelRadius = 42;
 
         if (dist < repelRadius && dist > 0) {
           const force = (1 - dist / repelRadius) * 1.6;
