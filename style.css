@@ -1,0 +1,178 @@
+/* ==========================================================================
+   CHIWWIE — 3D Immersive Universe Experience
+   Styles & Cinematic Presentation
+   ========================================================================== */
+
+:root {
+  --bg-deep: #020206;
+  --accent-cyan: #00f2fe;
+  --accent-violet: #8a2be2;
+  --accent-magenta: #ff007a;
+  --cursor-size: 8px;
+  --ring-size: 38px;
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg-deep);
+  color: #ffffff;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: none; /* Managed by 3D custom cursor */
+  position: fixed;
+  inset: 0;
+}
+
+/* Screen reader accessible element (Zero visible text clutter) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ==========================================================================
+   WebGL 3D Canvas
+   ========================================================================== */
+
+#webgl-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  display: block;
+  outline: none;
+}
+
+/* ==========================================================================
+   Cinematic Overlays
+   ========================================================================== */
+
+/* Vignette for filmic lens depth */
+.cinematic-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 45%,
+    rgba(2, 2, 6, 0.45) 75%,
+    rgba(2, 2, 6, 0.9) 100%
+  );
+}
+
+/* Opening Curtain: Starts pitch black, smoothly fades away */
+.opening-curtain {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000000;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 2.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.opening-curtain.loaded {
+  opacity: 0;
+}
+
+/* ==========================================================================
+   Custom Futuristic Cursor
+   ========================================================================== */
+
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--cursor-size);
+  height: var(--cursor-size);
+  background: #ffffff;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 12px #ffffff, 0 0 24px var(--accent-cyan);
+  transition: width 0.3s ease, height 0.3s ease, background 0.3s ease;
+  will-change: transform;
+}
+
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--ring-size);
+  height: var(--ring-size);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: 
+    width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    height 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.35s ease,
+    background-color 0.35s ease,
+    box-shadow 0.35s ease;
+  will-change: transform;
+}
+
+/* Cursor on 3D Object Hover */
+.cursor-ring.is-hovering {
+  width: 78px;
+  height: 78px;
+  border-color: rgba(0, 242, 254, 0.85);
+  background-color: rgba(0, 242, 254, 0.06);
+  box-shadow: 
+    0 0 30px rgba(0, 242, 254, 0.35),
+    inset 0 0 20px rgba(0, 242, 254, 0.15);
+  backdrop-filter: blur(1.5px);
+}
+
+.cursor-dot.is-hovering {
+  width: 5px;
+  height: 5px;
+  background: var(--accent-cyan);
+}
+
+/* Cursor on Click Shockwave */
+.cursor-ring.is-clicking {
+  transform: translate(-50%, -50%) scale(0.8);
+  border-color: var(--accent-magenta);
+}
+
+/* Mobile & Touch Devices */
+@media (hover: none) and (pointer: coarse) {
+  body {
+    cursor: auto;
+  }
+  .cursor-dot, .cursor-ring {
+    display: none !important;
+  }
+}
+
+/* Accessibility: Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .opening-curtain {
+    transition: none;
+  }
+}
