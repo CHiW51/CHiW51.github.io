@@ -1,6 +1,7 @@
 /**
- * CHIWWIE — 3D Immersive Universe Experience
+ * CHIWSPACE — 3D Immersive Universe Experience
  * Pure Three.js WebGL Interactive Art Installation
+ * Layout: "CHIW" (Top) / "SPACE" (Bottom)
  * No Frameworks, No Backend, 100% Client-Side
  */
 
@@ -12,21 +13,21 @@
     camera: {
       fov: 45,
       near: 0.1,
-      far: 1500,
-      initialZ: 340,
-      targetZ: 125,
-      mobileTargetZ: 190,
+      far: 1600,
+      initialZ: 370,
+      targetZ: 145,
+      mobileTargetZ: 215,
     },
     particles: {
-      deepStarCount: 2200,
-      stardustCount: 900,
-      sparkCount: 180,
+      deepStarCount: 2400,
+      stardustCount: 1000,
+      sparkCount: 190,
     },
     physics: {
-      mouseParallaxFactor: 24,
-      letterMagneticDist: 42,
-      letterMagneticPull: 0.35,
-      letterPullZ: 10,
+      mouseParallaxFactor: 22,
+      letterMagneticDist: 38,
+      letterMagneticPull: 0.32,
+      letterPullZ: 11,
       springDamping: 0.085,
     },
     colors: {
@@ -47,7 +48,7 @@
 
   // --- Three.js State Variables ---
   let scene, camera, renderer;
-  let chiwwieGroup;
+  let chiwspaceGroup;
   let letterMeshes = [];
   let abstractObjects = [];
   let deepStarSystem, stardustSystem;
@@ -68,11 +69,10 @@
 
   // Animation Timeline
   let introStartTime = null;
-  let isIntroComplete = false;
   let clock = new THREE.Clock();
 
   // --- Procedural 3D Letter Shapes Generator ---
-  // Generates bespoke avant-garde geometric shapes for C, H, I, W, W, I, E
+  // Generates bespoke avant-garde geometric shapes for C, H, I, W, S, P, A, E
   function createLetterShapes() {
     const shapes = {};
 
@@ -137,7 +137,63 @@
     shapeW.closePath();
     shapes['W'] = shapeW;
 
-    // 5. Letter 'E' (Sleek triple-prong monolith)
+    // 5. Letter 'S' (Futuristic geometric S-curve)
+    const shapeS = new THREE.Shape();
+    shapeS.moveTo(19, 20.5);
+    shapeS.lineTo(19, 26);
+    shapeS.lineTo(0, 26);
+    shapeS.lineTo(0, 11);
+    shapeS.lineTo(13.5, 11);
+    shapeS.lineTo(13.5, 5.5);
+    shapeS.lineTo(0, 5.5);
+    shapeS.lineTo(0, 0);
+    shapeS.lineTo(19, 0);
+    shapeS.lineTo(19, 15);
+    shapeS.lineTo(5.5, 15);
+    shapeS.lineTo(5.5, 20.5);
+    shapeS.closePath();
+    shapes['S'] = shapeS;
+
+    // 6. Letter 'P' (Monolith pillar + upper loop with hole)
+    const shapeP = new THREE.Shape();
+    shapeP.moveTo(0, 0);
+    shapeP.lineTo(5.5, 0);
+    shapeP.lineTo(5.5, 11);
+    shapeP.lineTo(19, 11);
+    shapeP.lineTo(19, 26);
+    shapeP.lineTo(0, 26);
+    shapeP.closePath();
+
+    const holeP = new THREE.Path();
+    holeP.moveTo(5.5, 15.5);
+    holeP.lineTo(13.5, 15.5);
+    holeP.lineTo(13.5, 21.5);
+    holeP.lineTo(5.5, 21.5);
+    holeP.closePath();
+    shapeP.holes.push(holeP);
+    shapes['P'] = shapeP;
+
+    // 7. Letter 'A' (Faceted trapezoid arch + triangular window)
+    const shapeA = new THREE.Shape();
+    shapeA.moveTo(0, 0);
+    shapeA.lineTo(5.5, 0);
+    shapeA.lineTo(7.5, 8);
+    shapeA.lineTo(14.5, 8);
+    shapeA.lineTo(16.5, 0);
+    shapeA.lineTo(22, 0);
+    shapeA.lineTo(13.5, 26);
+    shapeA.lineTo(8.5, 26);
+    shapeA.closePath();
+
+    const holeA = new THREE.Path();
+    holeA.moveTo(8.5, 12.5);
+    holeA.lineTo(13.5, 12.5);
+    holeA.lineTo(11, 20.5);
+    holeA.closePath();
+    shapeA.holes.push(holeA);
+    shapes['A'] = shapeA;
+
+    // 8. Letter 'E' (Sleek triple-prong monolith)
     const shapeE = new THREE.Shape();
     shapeE.moveTo(0, 0);
     shapeE.lineTo(18, 0);
@@ -166,7 +222,7 @@
     // Camera
     const aspect = width / height;
     camera = new THREE.PerspectiveCamera(CONFIG.camera.fov, aspect, CONFIG.camera.near, CONFIG.camera.far);
-    camera.position.set(0, 5, CONFIG.camera.initialZ);
+    camera.position.set(0, 0, CONFIG.camera.initialZ);
 
     // Renderer
     renderer = new THREE.WebGLRenderer({
@@ -178,14 +234,14 @@
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.3;
+    renderer.toneMappingExposure = 1.35;
     renderer.outputEncoding = THREE.sRGBEncoding;
 
     // Lighting
     setupLighting();
 
     // 3D Objects & Systems
-    setupChiwwieMonolith();
+    setupChiwspaceMonolith();
     setupAbstractSculptures();
     setupDeepStarSystem();
     setupReactiveStardust();
@@ -196,37 +252,43 @@
 
   // --- Lighting Setup ---
   function setupLighting() {
-    ambientLight = new THREE.AmbientLight(0x0a1020, 1.2);
+    ambientLight = new THREE.AmbientLight(0x0a1020, 1.25);
     scene.add(ambientLight);
 
     // Dynamic Cursor Point Light (Cyan)
-    pointLightCyan = new THREE.PointLight(CONFIG.colors.cyan, 3.8, 260, 1.6);
-    pointLightCyan.position.set(0, 0, 45);
+    pointLightCyan = new THREE.PointLight(CONFIG.colors.cyan, 4.0, 300, 1.5);
+    pointLightCyan.position.set(0, 0, 50);
     scene.add(pointLightCyan);
 
     // Orbital Violet Atmosphere Light
-    pointLightViolet = new THREE.PointLight(CONFIG.colors.violet, 3.2, 320, 1.4);
+    pointLightViolet = new THREE.PointLight(CONFIG.colors.violet, 3.4, 340, 1.4);
     pointLightViolet.position.set(-60, 30, -30);
     scene.add(pointLightViolet);
 
     // Counter-Orbit Magenta Light
-    pointLightMagenta = new THREE.PointLight(CONFIG.colors.magenta, 2.6, 280, 1.6);
+    pointLightMagenta = new THREE.PointLight(CONFIG.colors.magenta, 2.8, 300, 1.6);
     pointLightMagenta.position.set(60, -25, -20);
     scene.add(pointLightMagenta);
 
     // Specular Rim Directional Light
-    dirLightRim = new THREE.DirectionalLight(CONFIG.colors.platinum, 2.0);
-    dirLightRim.position.set(40, 90, 80);
+    dirLightRim = new THREE.DirectionalLight(CONFIG.colors.platinum, 2.2);
+    dirLightRim.position.set(45, 95, 85);
     scene.add(dirLightRim);
   }
 
-  // --- Build 3D CHIWWIE Monolith Letters ---
-  function setupChiwwieMonolith() {
-    chiwwieGroup = new THREE.Group();
-    scene.add(chiwwieGroup);
+  // --- Build 3D CHIWSPACE Monolith: CHIW (Top) / SPACE (Bottom) ---
+  function setupChiwspaceMonolith() {
+    chiwspaceGroup = new THREE.Group();
+    scene.add(chiwspaceGroup);
 
     const shapes = createLetterShapes();
-    const wordLetters = ['C', 'H', 'I', 'W', 'W', 'I', 'E'];
+
+    // Line 1: CHIW (Top)
+    // Line 2: SPACE (Bottom)
+    const lines = [
+      { text: ['C', 'H', 'I', 'W'], yPos: 17 },
+      { text: ['S', 'P', 'A', 'C', 'E'], yPos: -17 }
+    ];
 
     // Extrusion settings for deep beveled chamfers
     const extrudeSettings = {
@@ -256,67 +318,76 @@
       H: 23,
       I: 10,
       W: 28,
+      S: 22,
+      P: 22,
+      A: 24,
       E: 22,
     };
 
-    // Calculate total width for true center alignment
-    let totalWidth = 0;
-    wordLetters.forEach((char) => {
-      totalWidth += letterSpacings[char];
-    });
+    let globalIndex = 0;
 
-    let currentX = -totalWidth / 2;
+    lines.forEach((line) => {
+      // Calculate line width for center alignment
+      let lineWidth = 0;
+      line.text.forEach((char) => {
+        lineWidth += letterSpacings[char];
+      });
 
-    wordLetters.forEach((char, index) => {
-      const shape = shapes[char];
-      const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-      geometry.center(); // Center local pivot for pure 3D rotations
+      let currentX = -lineWidth / 2;
 
-      // Clone material so each letter can glow independently
-      const material = sharedMaterial.clone();
-      const mesh = new THREE.Mesh(geometry, material);
+      line.text.forEach((char) => {
+        const shape = shapes[char];
+        const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+        geometry.center(); // Center local pivot for true 3D rotations
 
-      const spacing = letterSpacings[char];
-      const targetX = currentX + spacing / 2;
-      currentX += spacing;
+        // Clone material so each letter can glow independently
+        const material = sharedMaterial.clone();
+        const mesh = new THREE.Mesh(geometry, material);
 
-      mesh.position.set(targetX, 0, 0);
+        const spacing = letterSpacings[char];
+        const targetX = currentX + spacing / 2;
+        currentX += spacing;
 
-      // Letter Metadata for Interactive Physics
-      const letterData = {
-        mesh: mesh,
-        index: index,
-        char: char,
-        basePos: new THREE.Vector3(targetX, 0, 0),
-        currentOffset: new THREE.Vector3(0, 0, 0),
-        targetOffset: new THREE.Vector3(0, 0, 0),
-        rotX: 0,
-        rotY: 0,
-        rotZ: 0,
-        targetRotX: 0,
-        targetRotY: 0,
-        targetRotZ: 0,
-        scale: 0.001, // Starts at 0 for entrance animation
-        targetScale: 1,
-        isHovered: false,
-        impulseOffset: 0,
-      };
+        mesh.position.set(targetX, line.yPos, 0);
 
-      mesh.userData = letterData;
-      letterMeshes.push(letterData);
-      chiwwieGroup.add(mesh);
+        // Letter Metadata for Interactive Physics
+        const letterData = {
+          mesh: mesh,
+          index: globalIndex,
+          char: char,
+          basePos: new THREE.Vector3(targetX, line.yPos, 0),
+          currentOffset: new THREE.Vector3(0, 0, 0),
+          targetOffset: new THREE.Vector3(0, 0, 0),
+          rotX: 0,
+          rotY: 0,
+          rotZ: 0,
+          targetRotX: 0,
+          targetRotY: 0,
+          targetRotZ: 0,
+          scale: 0.001, // Starts at 0 for entrance animation
+          targetScale: 1,
+          isHovered: false,
+          impulseOffset: 0,
+        };
+
+        mesh.userData = letterData;
+        letterMeshes.push(letterData);
+        chiwspaceGroup.add(mesh);
+
+        globalIndex++;
+      });
     });
   }
 
   // --- Abstract Floating 3D Sculptures ---
   function setupAbstractSculptures() {
     const geometries = [
-      new THREE.IcosahedronGeometry(4.5, 0),
-      new THREE.OctahedronGeometry(5.0, 0),
-      new THREE.DodecahedronGeometry(4.2, 0),
-      new THREE.TorusGeometry(8.5, 0.35, 16, 64),
-      new THREE.TorusGeometry(12.0, 0.3, 16, 64),
-      new THREE.IcosahedronGeometry(6.0, 1),
+      new THREE.IcosahedronGeometry(4.8, 0),
+      new THREE.OctahedronGeometry(5.2, 0),
+      new THREE.DodecahedronGeometry(4.5, 0),
+      new THREE.TorusGeometry(9.0, 0.35, 16, 64),
+      new THREE.TorusGeometry(13.0, 0.3, 16, 64),
+      new THREE.IcosahedronGeometry(6.5, 1),
     ];
 
     const sculptureMaterial = new THREE.MeshPhysicalMaterial({
@@ -324,23 +395,21 @@
       metalness: 0.85,
       roughness: 0.2,
       clearcoat: 0.8,
-      wireframe: false,
       transparent: true,
       opacity: 0.75,
       emissive: 0x050e1c,
     });
 
-    const count = 18;
+    const count = 20;
     for (let i = 0; i < count; i++) {
       const geom = geometries[i % geometries.length];
       const mesh = new THREE.Mesh(geom, sculptureMaterial.clone());
 
-      // Position in wide hollow volume around CHIWWIE
       const angle = (i / count) * Math.PI * 2;
-      const radius = 65 + Math.random() * 85;
-      const x = Math.cos(angle) * radius + (Math.random() - 0.5) * 40;
-      const y = Math.sin(angle) * (radius * 0.5) + (Math.random() - 0.5) * 40;
-      const z = (Math.random() - 0.5) * 160 - 20;
+      const radius = 70 + Math.random() * 95;
+      const x = Math.cos(angle) * radius + (Math.random() - 0.5) * 45;
+      const y = Math.sin(angle) * (radius * 0.6) + (Math.random() - 0.5) * 45;
+      const z = (Math.random() - 0.5) * 170 - 20;
 
       mesh.position.set(x, y, z);
       mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
@@ -348,9 +417,9 @@
       const objData = {
         mesh: mesh,
         baseY: y,
-        speedX: (Math.random() - 0.5) * 0.008,
-        speedY: (Math.random() - 0.5) * 0.008,
-        speedZ: (Math.random() - 0.5) * 0.008,
+        speedX: (Math.random() - 0.5) * 0.007,
+        speedY: (Math.random() - 0.5) * 0.007,
+        speedZ: (Math.random() - 0.5) * 0.007,
         floatSpeed: Math.random() * 0.8 + 0.4,
         floatOffset: Math.random() * Math.PI * 2,
         floatAmp: Math.random() * 8 + 4,
@@ -373,8 +442,7 @@
     const color3 = new THREE.Color(0xffffff);
 
     for (let i = 0; i < count; i++) {
-      // Spherical distribution
-      const r = 250 + Math.random() * 450;
+      const r = 260 + Math.random() * 480;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(Math.random() * 2 - 1);
 
@@ -382,7 +450,6 @@
       positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
       positions[i * 3 + 2] = r * Math.cos(phi);
 
-      // Color variation
       const randColor = Math.random();
       let chosenColor = color3;
       if (randColor < 0.4) chosenColor = color1;
@@ -423,9 +490,9 @@
     const magenta = new THREE.Color(CONFIG.colors.magenta);
 
     for (let i = 0; i < count; i++) {
-      // Dense cloud around CHIWWIE
-      const x = (Math.random() - 0.5) * 180;
-      const y = (Math.random() - 0.5) * 70;
+      // Surrounds both CHIW and SPACE lines
+      const x = (Math.random() - 0.5) * 160;
+      const y = (Math.random() - 0.5) * 90;
       const z = (Math.random() - 0.5) * 80;
 
       positions[i * 3] = x;
@@ -486,10 +553,9 @@
       positions[i * 3 + 1] = origin3D.y;
       positions[i * 3 + 2] = origin3D.z;
 
-      // Random 3D spherical direction
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(Math.random() * 2 - 1);
-      const speed = Math.random() * 2.8 + 1.2;
+      const speed = Math.random() * 3.0 + 1.2;
 
       velocities.push(
         new THREE.Vector3(
@@ -509,7 +575,7 @@
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const material = new THREE.PointsMaterial({
-      size: 2.5,
+      size: 2.6,
       vertexColors: true,
       transparent: true,
       opacity: 1.0,
@@ -527,14 +593,14 @@
       maxAge: 70,
     });
 
-    // Staggered Wave Bounce on CHIWWIE Letters
+    // Staggered Wave Bounce on CHIWSPACE Letters
     letterMeshes.forEach((item, idx) => {
       setTimeout(() => {
         item.impulseOffset = -14;
         setTimeout(() => {
           item.impulseOffset = 0;
-        }, 400);
-      }, idx * 40);
+        }, 380);
+      }, idx * 35);
     });
   }
 
@@ -548,18 +614,18 @@
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // Mobile / Portrait adaptation
+    // Mobile / Portrait adaptation for 2-line layout
     const isMobile = width < 768;
     const isSmallMobile = width < 480;
 
     if (isSmallMobile) {
-      chiwwieGroup.scale.set(0.68, 0.68, 0.68);
-      camera.targetZ = 195;
+      chiwspaceGroup.scale.set(0.72, 0.72, 0.72);
+      camera.targetZ = 225;
     } else if (isMobile) {
-      chiwwieGroup.scale.set(0.82, 0.82, 0.82);
-      camera.targetZ = 160;
+      chiwspaceGroup.scale.set(0.85, 0.85, 0.85);
+      camera.targetZ = 185;
     } else {
-      chiwwieGroup.scale.set(1.0, 1.0, 1.0);
+      chiwspaceGroup.scale.set(1.0, 1.0, 1.0);
       camera.targetZ = CONFIG.camera.targetZ;
     }
   }
@@ -586,26 +652,25 @@
     mouse.y += (mouse.targetY - mouse.y) * 0.05;
 
     camera.position.x = mouse.x * CONFIG.physics.mouseParallaxFactor;
-    camera.position.y = mouse.y * (CONFIG.physics.mouseParallaxFactor * 0.7) + 2;
+    camera.position.y = mouse.y * (CONFIG.physics.mouseParallaxFactor * 0.7);
     camera.position.z = currentBaseZ;
     camera.lookAt(0, 0, 0);
 
     // 2. Cursor Point Light Movement in 3D Space
-    // Convert normalized mouse to 3D plane coordinates
     pointLightCyan.position.x = mouse.x * 90;
-    pointLightCyan.position.y = mouse.y * 55;
-    pointLightCyan.position.z = 45;
+    pointLightCyan.position.y = mouse.y * 60;
+    pointLightCyan.position.z = 50;
 
     // Orbital Violet & Magenta lights
-    pointLightViolet.position.x = Math.cos(time * 0.6) * 90;
-    pointLightViolet.position.y = Math.sin(time * 0.8) * 40;
-    pointLightViolet.position.z = Math.sin(time * 0.5) * 50 - 20;
+    pointLightViolet.position.x = Math.cos(time * 0.6) * 95;
+    pointLightViolet.position.y = Math.sin(time * 0.8) * 45;
+    pointLightViolet.position.z = Math.sin(time * 0.5) * 55 - 20;
 
-    pointLightMagenta.position.x = -Math.cos(time * 0.5) * 85;
-    pointLightMagenta.position.y = -Math.sin(time * 0.7) * 35;
-    pointLightMagenta.position.z = Math.cos(time * 0.6) * 40 - 20;
+    pointLightMagenta.position.x = -Math.cos(time * 0.5) * 90;
+    pointLightMagenta.position.y = -Math.sin(time * 0.7) * 40;
+    pointLightMagenta.position.z = Math.cos(time * 0.6) * 45 - 20;
 
-    // 3. CHIWWIE Letters Entrance & Magnetic Physics
+    // 3. CHIWSPACE Letters Entrance & Magnetic Physics
     let isAnyHovered = false;
 
     // Raycast from mouse to 3D world plane Z=0
@@ -616,10 +681,9 @@
 
     letterMeshes.forEach((item) => {
       // Entrance Staggered Scaling
-      const staggerDelay = 0.4 + item.index * 0.12;
+      const staggerDelay = 0.35 + item.index * 0.09;
       if (elapsed > staggerDelay) {
-        const letterProgress = Math.min((elapsed - staggerDelay) / 1.0, 1.0);
-        // Elastic overshoot easing
+        const letterProgress = Math.min((elapsed - staggerDelay) / 0.9, 1.0);
         const elastic = 1 - Math.pow(1 - letterProgress, 4);
         item.targetScale = elastic;
       } else {
@@ -630,7 +694,7 @@
       const letterWorldPos = item.basePos.clone();
       const dist = letterWorldPos.distanceTo(rayIntersection);
 
-      if (dist < CONFIG.physics.letterMagneticDist && elapsed > 2.0) {
+      if (dist < CONFIG.physics.letterMagneticDist && elapsed > 1.8) {
         const pull = (1 - dist / CONFIG.physics.letterMagneticDist);
         const easedPull = Math.pow(pull, 1.5);
 
@@ -651,10 +715,10 @@
         isAnyHovered = true;
       } else {
         // Idle gentle float oscillation
-        const floatWave = Math.sin(time * 1.5 + item.index * 0.5) * 1.2;
+        const floatWave = Math.sin(time * 1.5 + item.index * 0.45) * 1.1;
         item.targetOffset.set(0, floatWave, 0);
-        item.targetRotX = Math.sin(time * 0.8 + item.index) * 0.04;
-        item.targetRotY = Math.cos(time * 0.9 + item.index) * 0.04;
+        item.targetRotX = Math.sin(time * 0.8 + item.index) * 0.035;
+        item.targetRotY = Math.cos(time * 0.9 + item.index) * 0.035;
         item.targetRotZ = 0;
 
         item.mesh.material.emissive.setHex(0x031428);
@@ -711,7 +775,6 @@
         let py = positions[idx + 1];
         let pz = positions[idx + 2];
 
-        // Drift slowly
         px += vels[idx];
         py += vels[idx + 1];
         pz += vels[idx + 2];
@@ -721,15 +784,14 @@
         const dy = py - rayIntersection.y;
         const dz = pz - rayIntersection.z;
         const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        const repelRadius = 35;
+        const repelRadius = 38;
 
         if (dist < repelRadius && dist > 0) {
-          const force = (1 - dist / repelRadius) * 1.5;
+          const force = (1 - dist / repelRadius) * 1.6;
           px += (dx / dist) * force;
           py += (dy / dist) * force;
           pz += (dz / dist) * force;
         } else {
-          // Return toward original positions with spring tension
           px += (orig[idx] - px) * 0.02;
           py += (orig[idx + 1] - py) * 0.02;
           pz += (orig[idx + 2] - pz) * 0.02;
@@ -758,12 +820,10 @@
         positions[idx + 1] += vel.y;
         positions[idx + 2] += vel.z;
 
-        // Gravity / Drag
         vel.multiplyScalar(0.965);
       }
       posAttr.needsUpdate = true;
 
-      // Fade out
       const progress = spark.age / spark.maxAge;
       spark.mesh.material.opacity = 1.0 - progress;
 
@@ -818,7 +878,6 @@
         mouse.rawX = e.clientX;
         mouse.rawY = e.clientY;
 
-        // Normalized Device Coordinates (-1 to +1)
         mouse.targetX = (e.clientX / width) * 2 - 1;
         mouse.targetY = -(e.clientY / height) * 2 + 1;
       },
@@ -829,7 +888,6 @@
     window.addEventListener('pointerdown', (e) => {
       cursorRing.classList.add('is-clicking');
 
-      // Project click coordinate into 3D world
       mouseVector.x = (e.clientX / width) * 2 - 1;
       mouseVector.y = -(e.clientY / height) * 2 + 1;
       raycaster.setFromCamera(mouseVector, camera);
