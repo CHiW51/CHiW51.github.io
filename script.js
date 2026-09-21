@@ -64,6 +64,7 @@
   let height = window.innerHeight;
   let mouse = { x: 0, y: 0, targetX: 0, targetY: 0, rawX: width / 2, rawY: height / 2 };
   let cursor = { dotX: width / 2, dotY: height / 2, ringX: width / 2, ringY: height / 2, isHover: false };
+  let domHoverType = null; // 'fb', 'ig', or null for custom cursor tinting
   let raycaster = new THREE.Raycaster();
   let mouseVector = new THREE.Vector2();
   let planeZ = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
@@ -746,7 +747,7 @@
       item.mesh.scale.set(item.scale, item.scale, item.scale);
     });
 
-    cursor.isHover = isAnyHovered;
+    cursor.isHover = isAnyHovered || Boolean(domHoverType);
 
     // 4. Abstract 3D Sculptures Floating Animation
     abstractObjects.forEach((obj) => {
@@ -890,6 +891,11 @@
     window.addEventListener('pointerdown', (e) => {
       cursorRing.classList.add('is-clicking');
 
+      // Do not trigger 3D spark explosion if user clicks on UI docks or links
+      if (e.target && e.target.closest && e.target.closest('.social-dock, a, button')) {
+        return;
+      }
+
       mouseVector.x = (e.clientX / width) * 2 - 1;
       mouseVector.y = -(e.clientY / height) * 2 + 1;
       raycaster.setFromCamera(mouseVector, camera);
@@ -903,6 +909,36 @@
     window.addEventListener('pointerup', () => {
       cursorRing.classList.remove('is-clicking');
     });
+
+    // Social Dock Interactive Hover Handlers
+    const socialFb = document.getElementById('socialFb');
+    const socialIg = document.getElementById('socialIg');
+
+    if (socialFb) {
+      socialFb.addEventListener('mouseenter', () => {
+        domHoverType = 'fb';
+        cursorRing.classList.add('is-hovering-fb');
+        cursorDot.classList.add('is-hovering-fb');
+      });
+      socialFb.addEventListener('mouseleave', () => {
+        if (domHoverType === 'fb') domHoverType = null;
+        cursorRing.classList.remove('is-hovering-fb');
+        cursorDot.classList.remove('is-hovering-fb');
+      });
+    }
+
+    if (socialIg) {
+      socialIg.addEventListener('mouseenter', () => {
+        domHoverType = 'ig';
+        cursorRing.classList.add('is-hovering-ig');
+        cursorDot.classList.add('is-hovering-ig');
+      });
+      socialIg.addEventListener('mouseleave', () => {
+        if (domHoverType === 'ig') domHoverType = null;
+        cursorRing.classList.remove('is-hovering-ig');
+        cursorDot.classList.remove('is-hovering-ig');
+      });
+    }
 
     // Touch Support
     window.addEventListener(
